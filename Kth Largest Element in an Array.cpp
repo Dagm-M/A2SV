@@ -1,0 +1,13 @@
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        make_heap(nums.begin(),nums.end());
+        int n = nums.size();
+        for(int i = 1; i < k ; i++)
+        {
+            pop_heap(nums.begin(),nums.end());
+            nums.pop_back();
+        }
+        return nums[0];
+    }
+};
