@@ -1,25 +1,46 @@
-class Solution:
-    def findCircleNum(self, isConnected: List[List[int]]) -> int:
-        size = len(isConnected)
-        adjList = defaultdict(list)
+class UnionFind:
+    def __init__(self, size):
+        self.rank = defaultdict(int)
+        self.rep = {i:i for i in range(size)}
+        
+    def representative(self, x):
+        temp = x
+        while self.rep[x] != x:
+            x = self.rep[x]
+        while self.rep[temp] != temp:
+            self.rep[temp] = x
+            temp = self.rep[temp]
+        return x
+		
+    def union(self, x, y):
+        xrep = self.representative(x)
+        yrep = self.representative(y)
+        if self.rank[xrep] >= self.rank[yrep]:
+            self.rep[yrep] = xrep
+            if self.rank[xrep] == self.rank[yrep]:
+                self.rank[xrep] += 1
+        else:
+            self.rep[xrep] = yrep
+                
 
-        for i in range(size):
-            for j in range(size):
-                if isConnected[i][j] == 1 and i != j:
-                    adjList[i+1].append(j+1)
+    def connected(self, x, y):
+        return self.rep[x] == self.rep[y]
 
-        seen = set()
-        count =0
+    def res(self):
+        return self.rep
 
-        def dfs(negbor):
-            seen.add(negbor)
-            for i in adjList[negbor]:
-                if i not in seen:
-                    dfs(i)
+class Solution(object):
+    def findCircleNum(self, isConnected):
+        uf = UnionFind(len(isConnected))
+        for i in range(len(isConnected)):
+            for j in range(len(isConnected[0])):
+                if isConnected[i][j] != 0:
+                    uf.union(i,j)
+        for i in range(len(isConnected)):
+            uf.representative(i)
+        res = uf.res()
+        count = set()
+        for val in res.values():
+            count.add(val)
 
-        for i in range(1,size+1):
-            if i not in seen:
-                dfs(i)
-                count += 1
-
-        return count
+        return len(count)
